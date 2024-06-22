@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  # db:
+  #   image: postgres:14
+  #   environment:
+  #     POSTGRES_DB: mydb
+  #     POSTGRES_USER: myuser
+  #     POSTGRES_PASSWORD: mypassword
+    
+  #   networks:
+  #     - mynetwork
+    
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  
+  django:
+    build: .
+    # depends_on:
+    #   - db
+    networks:
+      - mynetwork
+    ports:
+      - "8000:8001"
+
+    volumes:
+      - app-data:/app/media/product_images
+      # - app-data:/app/db.sqlite3
+
+volumes:
+  # db-data:
+  app-data:
+
+networks:
+  mynetwork:
+    
