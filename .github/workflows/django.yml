@@ -1,0 +1,80 @@
+name: ST3 Release Django
+
+env:
+  ST3_DJANGO_REPO: us-central1-docker.pkg.dev/stg-disco-airflow/django-st3/django-st3
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "django/st3/__init__.py"
+      - "django/helm/Chart.yaml"
+  workflow_dispatch:
+
+jobs:
+  release_django:
+    runs-on: self-hosted
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      # - id: 'auth'
+      #   name: 'Authenticate to Google Cloud'
+      #   uses: 'google-github-actions/auth@v1'
+      #   with:
+      #     credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      # - name: 'Set up Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v2'
+
+      # - name: Login to GAR
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: us-central1-docker.pkg.dev
+      #     username: _json_key
+      #     password: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      # - uses: ./.github/actions/install-helm
+
+      # - uses: ./.github/actions/install-kubectl
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+
+      - id: buildx-context
+        run: |
+          docker context create builder
+
+      - id: buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          endpoint: builder
+
+      # - name: Get Django version
+      #   run: |
+      #     pip install celery==5.3.4
+      #     cd django
+      #     echo "DJANGO_VERSION=$(python -c 'import st3; print(st3.__version__)')" >> $GITHUB_ENV
+      #   shell: bash
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./django
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{env.ST3_DJANGO_REPO}}:${{env.DJANGO_VERSION}},${{env.ST3_DJANGO_REPO}}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # - name: Build and push helm chart
+      #   run: |
+      #     make release_django_helm
+
+      # - name: Deploy update to Dev
+      #   run: |
+      #     gcloud components install gke-gcloud-auth-plugin
+      #     gcloud container clusters get-credentials dev-cluster --region us-central1-c --project stg-disco-airflow
+      #     kubectl -n appsmith-dev rollout restart deployment django-st3-dev django-st3-dev-celery-beat django-st3-dev-celery-flower django-st3-dev-celery-worker
