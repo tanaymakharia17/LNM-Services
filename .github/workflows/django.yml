@@ -12,7 +12,7 @@ on:
 
 jobs:
   release_django:
-    runs-on: self-hosted
+    runs-on: github-actions
     steps:
       - name: checkout
         uses: actions/checkout@v4
