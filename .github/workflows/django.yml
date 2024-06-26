@@ -2,7 +2,7 @@ name: LNMservices Django build and push image workflow
 
 env:
   DJANGO_VERSION: 0.0.1
-  ST3_DJANGO_REPO: your-docker-repo-name  # Set your Docker repository name here
+  ST3_DJANGO_REPO: lnmservices  # Set your Docker repository name here
 
 on:
   push:
@@ -51,6 +51,6 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: $lnmservices:latest
+          tags: ${{env.ST3_DJANGO_REPO}}:${{env.DJANGO_VERSION}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
