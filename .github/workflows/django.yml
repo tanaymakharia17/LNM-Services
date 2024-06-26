@@ -18,10 +18,23 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
         with:
-          python-version: '3.9'
-          cache: 'pip'
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+      
+      - name: Login to GAR
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+
 
       - id: buildx-context
         run: |
@@ -38,6 +51,6 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ env.ST3_DJANGO_REPO }}:${{ env.DJANGO_VERSION }},${{ env.ST3_DJANGO_REPO }}:latest
+          tags: $lnmservices:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
