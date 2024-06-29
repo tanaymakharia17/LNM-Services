@@ -24,10 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5snlay(x0xbig^d=9z)n@mw#3vo^@d7vvw8hu#el2*73@1!*be'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']#['localhost', "127.0.0.1"]
-
+CSRF_TRUSTED_ORIGINS = [
+    '*',
+]
 
 # Application definition
 
@@ -142,3 +144,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yourpersonalbot@gmail.com'
 EMAIL_HOST_PASSWORD = 'bothoe@1298'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
